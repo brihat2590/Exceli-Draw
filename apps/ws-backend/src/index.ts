@@ -1,6 +1,7 @@
 import { URLSearchParams } from "url";
 import jwt from "jsonwebtoken"
 import { WebSocketServer,WebSocket } from "ws";
+const prismaCli=require("@repo/db/prisma")
 
 const JWT_SECRET=require("@repo/backend-common/secret")
 console.log(JWT_SECRET)
@@ -95,6 +96,13 @@ wss.on('connection', function connection(ws, request) {
     //       userId
     //     }
     //   });
+      await prismaCli.chat.create({
+        data:{
+          roomId:Number(roomId),
+          message,
+          userId
+        }
+      })
 
       users.forEach(user => {
         if (user.rooms.includes(roomId)) {
