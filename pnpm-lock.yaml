@@ -55,7 +55,7 @@ importers:
         specifier: 5.7.3
         version: 5.7.3
 
-  apps/http-backend:
+  apps/http-backend1:
     dependencies:
       '@types/bcrypt':
         specifier: ^5.0.2
@@ -153,6 +153,9 @@ importers:
       '@repo/backend-common':
         specifier: workspace:*
         version: link:../../packages/backend-common
+      '@repo/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
