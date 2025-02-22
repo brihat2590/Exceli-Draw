@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BACKEND_URL } from "./config";
+import { BACKEND_URL } from "../../config";
 
 async function getRoom(slug:any){
     const response=await axios.get(`${BACKEND_URL}/room/${slug}`)
