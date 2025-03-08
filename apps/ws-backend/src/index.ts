@@ -55,18 +55,12 @@ wss.on('connection', function connection(ws, request) {
     ws
   })
 
-  ws.on('message', async function message(data:any) {
+  ws.on('message', async function message(data) {
     let parsedData;
-    try{
-        if (typeof data !== "string") {
-            parsedData = JSON.parse(data.toString());
-          } else {
-            parsedData = JSON.parse(data); // {type: "join-room", roomId: 1}
-          }
-    }
-    catch(e:any){
-        console.error("Invalid JSON received:", data);
-        return;
+    if (typeof data !== "string") {
+      parsedData = JSON.parse(data.toString());
+    } else {
+      parsedData = JSON.parse(data); // {type: "join-room", roomId: 1}
     }
 
     if (parsedData.type === "join-room") {
@@ -89,20 +83,13 @@ wss.on('connection', function connection(ws, request) {
       const roomId = parsedData.roomId;
       const message = parsedData.message;
 
-    //   await prismaClient.chat.create({
-    //     data: {
-    //       roomId: Number(roomId),
-    //       message,
-    //       userId
-    //     }
-    //   });
       await prismaCli.chat.create({
-        data:{
-          roomId:Number(roomId),
+        data: {
+          roomId: Number(roomId),
           message,
           userId
         }
-      })
+      });
 
       users.forEach(user => {
         if (user.rooms.includes(roomId)) {
@@ -118,8 +105,6 @@ wss.on('connection', function connection(ws, request) {
   });
 
 });
-
-
 
 
 

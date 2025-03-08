@@ -6,9 +6,10 @@ const bcrypt=require("bcrypt")
 
 import { middleware } from "./midleware";
 import express  from "express"
+import cors from "cors"
 import jwt from "jsonwebtoken"
 const app=express();
-
+app.use(cors());
 app.use(express.json());
 app.post("/signup",async(req,res)=>{
     const{email,password,name}=req.body;
