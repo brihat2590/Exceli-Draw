@@ -1,2 +1,9 @@
 @import "tailwindcss";
 
+
+body, html {
+    overflow: hidden;  /* Disables scrolling */
+    height: 100%;      /* Ensures full height */
+    margin: 0;
+    padding: 0;
+}
