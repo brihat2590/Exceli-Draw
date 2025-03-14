@@ -21,7 +21,8 @@ type Shape = {
 }
 
 export async function initDraw(canvas: HTMLCanvasElement, roomId: string, socket: WebSocket) {
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d");//getting the 2d rendering context
+    //the 2d context provides the function to draw and manipulate graphics on the canvas
 
     let existingShapes: Shape[] = await getExistingShapes(roomId);
 
@@ -147,7 +148,7 @@ function clearCanvas(existingShapes: Shape[], canvas: HTMLCanvasElement, ctx: Ca
         }
 })}
 
-async function getExistingShapes(roomId: string) {
+export async function getExistingShapes(roomId: string) {
     const res = await axios.get(`${BACKEND_URL}/chats/${roomId}`);
     const messages = res.data.messages;
 
