@@ -55,6 +55,8 @@ export async function initDraw(canvas: HTMLCanvasElement, roomId: string, socket
                 points: [{ x: e.offsetX, y: e.offsetY }]
             };
             ctx.beginPath();
+            ctx.strokeStyle = "rgba(255, 255, 255)";
+            ctx.lineWidth = 2;
             ctx.moveTo(e.offsetX, e.offsetY);
         }
     });
@@ -109,15 +111,21 @@ export async function initDraw(canvas: HTMLCanvasElement, roomId: string, socket
         if (selectedTool === "pencil" && currentStroke) {
             currentStroke.points.push({ x: e.offsetX, y: e.offsetY });
             ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.strokeStyle = "rgba(255, 255, 255)";
+            ctx.lineWidth = 2;
             ctx.stroke();
         } else if (selectedTool === "rect") {
             clearCanvas(existingShapes, canvas, ctx);
+            ctx.strokeStyle = "rgba(255, 255, 255)";
+            ctx.lineWidth = 1;
             ctx.strokeRect(startX, startY, e.offsetX - startX, e.offsetY - startY);
         } else if (selectedTool === "circle") {
             clearCanvas(existingShapes, canvas, ctx);
             const radius = Math.sqrt(
                 Math.pow(e.offsetX - startX, 2) + Math.pow(e.offsetY - startY, 2)
             );
+            ctx.strokeStyle = "rgba(255, 255, 255)";
+            ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.arc(startX, startY, radius, 0, Math.PI * 2);
             ctx.stroke();

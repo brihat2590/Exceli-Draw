@@ -2,11 +2,14 @@
 import { WS_URL } from "./config"
 import { useEffect, useState } from "react"
 import { Canvas } from "./Canvas"
+import { useRouter } from "next/navigation"
 
 export function RoomCanvas({ roomId }:{
     roomId:string
 }) {
     const [socket, setSocket] = useState<WebSocket | null>(null);
+    const router=useRouter();
+    
 
     useEffect(() => {
         
@@ -31,12 +34,24 @@ export function RoomCanvas({ roomId }:{
             console.log("WebSocket Disconnected");
             setSocket(null);
         };
+        
 
         // Cleanup function to close the WebSocket when unmounting
         return () => {
             ws.close();
         };
-    }, [roomId]); // Add `roomId` as a dependency
+
+        
+    }, [roomId]);
+    useEffect(()=>{
+        const token=localStorage.getItem("token")
+        if(!token){
+            router.push("/signin")
+            
+        }
+
+    },[]) // Add `roomId` as a dependency
+   
 
     if (!socket) {
         return (

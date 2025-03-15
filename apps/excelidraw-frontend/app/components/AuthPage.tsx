@@ -26,11 +26,15 @@ export default function AuthPage({ isSignin }: { isSignin: boolean }) {
     }
     async function signIN(e:any){
       e.preventDefault();
-      const response=await axios.post(`${BACKEND_URL}/signin`);
+      const response=await axios.post(`${BACKEND_URL}/signin`,{
+        email:email,
+        password:password
+
+      });
       const jwt=response.data.token;
       localStorage.setItem("token",jwt);
       router.push("/");
-      alert("you have been signed up")
+      alert("you have been signed in")
 
         
       
@@ -69,9 +73,7 @@ export default function AuthPage({ isSignin }: { isSignin: boolean }) {
         />
         <button
           className="w-full p-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all"
-          onClick={() => {
-            {isSignin? signIN:signUP}
-          }}
+          onClick={isSignin ? signIN : signUP}
         >
           {isSignin ? "Sign In" : "Sign Up"}
         </button>
