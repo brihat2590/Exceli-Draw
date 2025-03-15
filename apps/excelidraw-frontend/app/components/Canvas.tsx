@@ -1,7 +1,7 @@
 import { useEffect, useRef,useState } from "react"
 import { initDraw } from "@/draw";
 import {IconButton} from "./Icon";
-import { Circle, Icon, Pencil, RectangleHorizontal } from "lucide-react";
+import { Circle, Icon, Pencil, RectangleHorizontal,Palette } from "lucide-react";
 
 export function Canvas({roomId,socket}:{
     roomId:string,
@@ -10,6 +10,8 @@ export function Canvas({roomId,socket}:{
     const CanvasRef=useRef<HTMLCanvasElement>(null);
     type shape="rect"|"circle"|"pencil";
     const[selectedtool,setSelectedtool]=useState<shape>("circle");
+
+    const [selectedColor,setSelectedColor]=useState<string>("rgb(255, 255, 255)");
     useEffect(()=>{
             if(CanvasRef.current){
              initDraw(CanvasRef.current,roomId,socket)
@@ -22,7 +24,10 @@ export function Canvas({roomId,socket}:{
          useEffect(()=>{
             //@ts-ignore
             window.selectedTool=selectedtool;
-         },[selectedtool])
+            //@ts-ignore
+            window.selectedColor=selectedColor;
+         },[selectedtool,selectedColor])
+         
          function Topbar({ selectedtool, setSelectedtool }: { 
             selectedtool: shape, 
             setSelectedtool: (s: shape) => void 
@@ -39,6 +44,35 @@ export function Canvas({roomId,socket}:{
                 </div>
             );
         }
+        function ColorPicker({ selectedColor, setSelectedColor }: { 
+            selectedColor: string, 
+            setSelectedColor: (s: string) => void 
+        }) {
+            return(
+                <div className="fixed top-10 right-10 antialiased">
+                    <div className=" right-10 top-5   text-white p-2 rounded-md shadow-lg  gap-2 flex items-center">
+
+                        <div className=" rounded-md shadow-lg flex flex-col items-center gap-4">
+
+
+                            <button className="p-4 rounded-2xl bg-white" onClick={()=>setSelectedColor("rgba(255,255,255,0.5)")} value={selectedColor}></button>
+                            <button className="p-4 rounded-2xl bg-green-500" onClick={()=>setSelectedColor("rgba(0,255,0,0.5)")} value={selectedColor}></button>
+                            <button className="p-4 rounded-2xl bg-red-500" onClick={()=>setSelectedColor("rgba(255,0,0,0.5)")} value={selectedColor}></button>
+                            
+                        </div>
+
+
+
+
+
+
+
+                    </div>
+
+
+                </div>
+            )
+        }
         
          
 
@@ -47,6 +81,7 @@ export function Canvas({roomId,socket}:{
         <div >
             <canvas ref={CanvasRef} height={window.innerHeight} width={window.innerWidth}></canvas>
             <Topbar setSelectedtool={setSelectedtool} selectedtool={selectedtool}/>
+            <ColorPicker setSelectedColor={setSelectedColor} selectedColor={selectedColor}/>
             
 
         </div>

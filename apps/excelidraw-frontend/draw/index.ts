@@ -1,6 +1,7 @@
 import { BACKEND_URL } from "@/config";
 import axios from "axios";
 
+
 type Shape = {
     type: "rect";
     x: number;
@@ -21,6 +22,12 @@ type PencilStroke = {
     type: "pencil";
     points: { x: number; y: number }[];
 };
+
+function getColor(){
+    //@ts-ignore
+    return window.selectedColor || "rgba(255,255,255,0.5)";
+    
+}
 
 export async function initDraw(canvas: HTMLCanvasElement, roomId: string, socket: WebSocket) {
     const ctx = canvas.getContext("2d");
@@ -55,7 +62,7 @@ export async function initDraw(canvas: HTMLCanvasElement, roomId: string, socket
                 points: [{ x: e.offsetX, y: e.offsetY }]
             };
             ctx.beginPath();
-            ctx.strokeStyle = "rgba(255, 255, 255)";
+            ctx.strokeStyle=getColor();
             ctx.lineWidth = 2;
             ctx.moveTo(e.offsetX, e.offsetY);
         }
@@ -111,12 +118,12 @@ export async function initDraw(canvas: HTMLCanvasElement, roomId: string, socket
         if (selectedTool === "pencil" && currentStroke) {
             currentStroke.points.push({ x: e.offsetX, y: e.offsetY });
             ctx.lineTo(e.offsetX, e.offsetY);
-            ctx.strokeStyle = "rgba(255, 255, 255)";
+            ctx.strokeStyle=getColor();
             ctx.lineWidth = 2;
             ctx.stroke();
         } else if (selectedTool === "rect") {
             clearCanvas(existingShapes, canvas, ctx);
-            ctx.strokeStyle = "rgba(255, 255, 255)";
+            ctx.strokeStyle = getColor();
             ctx.lineWidth = 1;
             ctx.strokeRect(startX, startY, e.offsetX - startX, e.offsetY - startY);
         } else if (selectedTool === "circle") {
@@ -124,7 +131,7 @@ export async function initDraw(canvas: HTMLCanvasElement, roomId: string, socket
             const radius = Math.sqrt(
                 Math.pow(e.offsetX - startX, 2) + Math.pow(e.offsetY - startY, 2)
             );
-            ctx.strokeStyle = "rgba(255, 255, 255)";
+            ctx.strokeStyle = getColor();
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.arc(startX, startY, radius, 0, Math.PI * 2);
@@ -144,7 +151,7 @@ function clearCanvas(existingShapes: Shape[], canvas: HTMLCanvasElement, ctx: Ca
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     existingShapes.forEach((shape) => {
-        ctx.strokeStyle = "rgba(255, 255, 255)";
+        ctx.strokeStyle = getColor();
         if (shape.type === "rect") {
             ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
         } else if (shape.type === "circle") {

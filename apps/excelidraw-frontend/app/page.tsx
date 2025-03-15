@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Link from 'next/link';
 import { 
@@ -11,7 +12,10 @@ import {
 } from 'lucide-react';
 
 
+
+
 function App() {
+  
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
@@ -23,9 +27,7 @@ function App() {
               <span className="ml-2 text-xl font-bold text-gray-900">ExceliDraw</span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-gray-600 hover:text-gray-900">Features</a>
-              <a href="#pricing" className="text-gray-600 hover:text-gray-900">Pricing</a>
-              <a href="#about" className="text-gray-600 hover:text-gray-900">About</a>
+              
               <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
                 Get Started
               </button>
@@ -50,14 +52,14 @@ function App() {
                   </p>
                   <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
                     <div className="rounded-md shadow">
-                      <a href="#" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10">
+                      <Link href="/signin" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10" > 
                         Start Drawing
-                      </a>
+                      </Link>
                     </div>
                     <div className="mt-3 sm:mt-0 sm:ml-3">
-                      <a href="#" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-indigo-100 hover:bg-indigo-200 md:py-4 md:text-lg md:px-10">
+                      <Link href="/canvas/6" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-indigo-100 hover:bg-indigo-200 md:py-4 md:text-lg md:px-10">
                         Live Demo
-                      </a>
+                      </Link>
                     </div>
                   </div>
                 </div>
