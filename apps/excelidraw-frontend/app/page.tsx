@@ -1,4 +1,4 @@
-
+"use client"
 import React from 'react';
 import Link from 'next/link';
 import { 
@@ -10,12 +10,26 @@ import {
   ArrowRight,
   Github 
 } from 'lucide-react';
-
-
-
+import { useRouter } from 'next/navigation';
+import { log } from 'console';
 
 function App() {
-  
+  const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+
+  React.useEffect(() => {
+    // Check localStorage only after component mounts (client-side)
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
+  }, []);
+
+  function logout() {
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
+    alert("logged out");
+    router.push("/signin");
+  }
+
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
@@ -27,10 +41,16 @@ function App() {
               <span className="ml-2 text-xl font-bold text-gray-900">ExceliDraw</span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
-              
-              <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
-                Get Started
-              </button>
+              {!isLoggedIn && (
+                <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+                  <Link href="/signin">Get Started</Link>
+                </button>
+              )}
+              {isLoggedIn && (
+                <button onClick={logout} className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+                  <Link href="/signin">logout</Link>
+                </button>
+              )}
             </div>
           </div>
         </div>

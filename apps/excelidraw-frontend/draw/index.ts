@@ -8,19 +8,23 @@ type Shape = {
     y: number;
     width: number;
     height: number;
+    color: string;
 } | {
     type: "circle";
     centerX: number;
     centerY: number;
     radius: number;
+    color: string;
 } | {
     type: "pencil";
     points: { x: number; y: number }[];
+    color: string;
 };
 
 type PencilStroke = {
     type: "pencil";
     points: { x: number; y: number }[];
+    color: string;
 };
 
 function getColor(){
@@ -59,10 +63,11 @@ export async function initDraw(canvas: HTMLCanvasElement, roomId: string, socket
         if (window.selectedTool === "pencil") {
             currentStroke = {
                 type: "pencil",
-                points: [{ x: e.offsetX, y: e.offsetY }]
+                points: [{ x: e.offsetX, y: e.offsetY }],
+                color: getColor()
             };
             ctx.beginPath();
-            ctx.strokeStyle=getColor();
+            ctx.strokeStyle = getColor();
             ctx.lineWidth = 2;
             ctx.moveTo(e.offsetX, e.offsetY);
         }
@@ -78,34 +83,45 @@ export async function initDraw(canvas: HTMLCanvasElement, roomId: string, socket
         if (selectedTool === "rect") {
             const width = e.offsetX - startX;
             const height = e.offsetY - startY;
-            shape = {
-                type: "rect",
-                x: startX,
-                y: startY,
-                width,
-                height
-            };
+            if (width !== 0 && height !== 0) {  // Only create shape if it has size
+                shape = {
+                    type: "rect",
+                    x: startX,
+                    y: startY,
+                    width,
+                    height,
+                    color: getColor()
+                };
+            }
         } else if (selectedTool === "circle") {
             const radius = Math.sqrt(
                 Math.pow(e.offsetX - startX, 2) + Math.pow(e.offsetY - startY, 2)
             );
-            shape = {
-                type: "circle",
-                centerX: startX,
-                centerY: startY,
-                radius
-            };
+            if (radius > 0) {  // Only create shape if it has size
+                shape = {
+                    type: "circle",
+                    centerX: startX,
+                    centerY: startY,
+                    radius,
+                    color: getColor()
+                };
+            }
         } else if (selectedTool === "pencil" && currentStroke) {
-            shape = currentStroke;
+            if (currentStroke.points.length > 1) {  // Only create shape if it has multiple points
+                shape = currentStroke;
+            }
         }
 
         if (shape) {
             existingShapes.push(shape);
+            // Send the shape only once when it's finalized
             socket.send(JSON.stringify({
                 type: "chat",
                 message: JSON.stringify({ shape }),
                 roomId
             }));
+            // Redraw canvas with the new shape
+            clearCanvas(existingShapes, canvas, ctx);
         }
         currentStroke = null;
     });
@@ -118,25 +134,53 @@ export async function initDraw(canvas: HTMLCanvasElement, roomId: string, socket
         if (selectedTool === "pencil" && currentStroke) {
             currentStroke.points.push({ x: e.offsetX, y: e.offsetY });
             ctx.lineTo(e.offsetX, e.offsetY);
-            ctx.strokeStyle=getColor();
+            ctx.strokeStyle = currentStroke.color;
             ctx.lineWidth = 2;
             ctx.stroke();
-        } else if (selectedTool === "rect") {
-            clearCanvas(existingShapes, canvas, ctx);
-            ctx.strokeStyle = getColor();
+        } else if (selectedTool === "rect" || selectedTool === "circle") {
+            // Clear only the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "rgba(0, 0, 0)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Redraw existing shapes first
+            existingShapes.forEach((shape) => {
+                ctx.strokeStyle = shape.color;
+                if (shape.type === "rect") {
+                    ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
+                } else if (shape.type === "circle") {
+                    ctx.beginPath();
+                    ctx.arc(shape.centerX, shape.centerY, shape.radius, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.closePath();
+                } else if (shape.type === "pencil") {
+                    ctx.beginPath();
+                    ctx.lineWidth = 2;
+                    shape.points.forEach((point, index) => {
+                        if (index === 0) ctx.moveTo(point.x, point.y);
+                        else ctx.lineTo(point.x, point.y);
+                    });
+                    ctx.stroke();
+                    ctx.closePath();
+                }
+            });
+
+            // Draw the preview shape
+            const currentColor = getColor();
+            ctx.strokeStyle = currentColor;
             ctx.lineWidth = 1;
-            ctx.strokeRect(startX, startY, e.offsetX - startX, e.offsetY - startY);
-        } else if (selectedTool === "circle") {
-            clearCanvas(existingShapes, canvas, ctx);
-            const radius = Math.sqrt(
-                Math.pow(e.offsetX - startX, 2) + Math.pow(e.offsetY - startY, 2)
-            );
-            ctx.strokeStyle = getColor();
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.arc(startX, startY, radius, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.closePath();
+
+            if (selectedTool === "rect") {
+                ctx.strokeRect(startX, startY, e.offsetX - startX, e.offsetY - startY);
+            } else {  // circle
+                const radius = Math.sqrt(
+                    Math.pow(e.offsetX - startX, 2) + Math.pow(e.offsetY - startY, 2)
+                );
+                ctx.beginPath();
+                ctx.arc(startX, startY, radius, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.closePath();
+            }
         }
     });
 
@@ -151,7 +195,7 @@ function clearCanvas(existingShapes: Shape[], canvas: HTMLCanvasElement, ctx: Ca
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     existingShapes.forEach((shape) => {
-        ctx.strokeStyle = getColor();
+        ctx.strokeStyle = shape.color;
         if (shape.type === "rect") {
             ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
         } else if (shape.type === "circle") {
